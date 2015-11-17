@@ -23,3 +23,22 @@ Unperturbed stream
 We simulate the unperturbed stream evolution as::
 
    gyrfalcON in=gc_shifted.nemo out=$DATADIR/bovy/stream-stream/gc_evol_unp.nemo tstop=10.750 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gc_evol_unp.log 2>&1
+
+Perturbed stream
+-----------------
+
+We simulate the perturbed stream in a few different steps:
+
+   * We simulate the GC separately until 0.125 time units before the
+     impact
+
+   * We simulate the DM halo separately until 0.125 time units before
+     the impact; the DM halo is started at different times to create
+     different length tails
+
+   * We then combine the two snapshots and integrate them forward for
+     0.25 time units
+
+   * Then we separate out the GC again and integrate it forward for
+     another 0.375 time units to end up at the same time as the
+     unperturbed stream above.
