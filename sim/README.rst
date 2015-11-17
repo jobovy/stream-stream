@@ -42,3 +42,10 @@ We simulate the perturbed stream in a few different steps:
    * Then we separate out the GC again and integrate it forward for
      another 0.375 time units to end up at the same time as the
      unperturbed stream above.
+
+Unperturbed evolution up to impact
++++++++++++++++++++++++++++++++++++
+
+Do::
+
+	gyrfalcON in=gc_shifted.nemo out=$DATADIR/bovy/stream-stream/gc_evol_untilimpact.nemo tstop=10.10.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gc_evol_untilimpact.log 2>&1
