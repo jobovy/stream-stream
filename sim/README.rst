@@ -77,6 +77,11 @@ as::
 
 	snapshift dm.nemo dm_shifted_1.125.nemo rshift=-7.4115651013300745,-5.8569155874230869,-4.9401086177590141 vshift=-57.329247868892914,-129.90969599626123,206.23950245614526
 
+f the DM halo starts out 0.50 time units ago, we need to shift it
+as::
+
+	snapshift dm.nemo dm_shifted_0.50.nemo rshift=7.9948807918667892,0.9626499711978439,-11.344426189362455 vshift=-100.4814119301404,-151.74007155179646,-84.037056563181252
+
 If the DM halo starts out 0.25 time units ago, we need to shift it
 as::
 
@@ -88,4 +93,5 @@ impact::
 	gyrfalcON in=dm_shifted_10.25.nemo out=$DATADIR/bovy/stream-stream/dm_evol_10.25_untilimpact.nemo tstop=10.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_10.25_untilimpact.log 2>&1
 	gyrfalcON in=dm_shifted_5.125.nemo out=$DATADIR/bovy/stream-stream/dm_evol_5.125_untilimpact.nemo tstop=5. eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_5.125_untilimpact.log 2>&1
 	gyrfalcON in=dm_shifted_1.125.nemo out=$DATADIR/bovy/stream-stream/dm_evol_1.125_untilimpact.nemo tstop=1. eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_1.125_untilimpact.log 2>&1
+	gyrfalcON in=dm_shifted_0.50.nemo out=$DATADIR/bovy/stream-stream/dm_evol_0.50_untilimpact.nemo tstop=0.375 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_0.50_untilimpact.log 2>&1
 	gyrfalcON in=dm_shifted_0.25.nemo out=$DATADIR/bovy/stream-stream/dm_evol_0.25_untilimpact.nemo tstop=0.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_0.25_untilimpact.log 2>&1
