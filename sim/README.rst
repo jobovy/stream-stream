@@ -41,10 +41,6 @@ We simulate the perturbed stream in a few different steps:
    * We then combine the two snapshots and integrate them forward for
      0.25 time units
 
-   * Then we separate out the GC again and integrate it forward for
-     another 0.375 time units to end up at the same time as the
-     unperturbed stream above.
-
 Unperturbed evolution up to impact
 +++++++++++++++++++++++++++++++++++
 
