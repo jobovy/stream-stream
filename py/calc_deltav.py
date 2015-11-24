@@ -63,7 +63,7 @@ def vxta_deltav(snap_gc,apar,acfs):
     return (v_gc,x_gc,t_gc,apar_gc)
 
 def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
-                              rs=0.01,
+                              rs=0.1,
                               tmax=0.25*0.9777922212082034/\
                                   bovy_conversion.time_in_Gyr(V0,R0)):
     """
@@ -114,7 +114,7 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
         deltav[ii,2] = -ogalpot.vz(halftimes[-1])-v[ii,2]
     return deltav
 
-def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.05):
+def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.2):
     """
     NAME:
        calc_fullplummer_deltav
