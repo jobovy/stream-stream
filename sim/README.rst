@@ -26,6 +26,11 @@ We simulate the unperturbed stream evolution as::
 
    gyrfalcON in=gc_shifted.nemo out=$DATADIR/bovy/stream-stream/gc_evol_unp.nemo tstop=10.750 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gc_evol_unp.log 2>&1
 
+We save the snapshot at impact separately, to be able to load it
+quickly later::
+
+	snaptrim in=$DATADIR/bovy/stream-stream/gc_evol_unp.nemo out=$DATADIR/bovy/stream-stream/gc_evol_unp_atimpact.nemo times=10.250
+
 Perturbed stream
 -----------------
 
@@ -48,6 +53,7 @@ Do::
 
 	gyrfalcON in=gc_shifted.nemo out=$DATADIR/bovy/stream-stream/gc_evol_untilimpact.nemo tstop=10.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gc_evol_untilimpact.log 2>&1
 	snaptrim in=$DATADIR/bovy/stream-stream/gc_evol_untilimpact.nemo out=-  times=10.125 | snaptime in=- out=gc_beforeimpact.nemo
+
 DM perturber
 +++++++++++++
 
