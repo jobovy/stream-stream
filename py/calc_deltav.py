@@ -10,6 +10,14 @@ from galpy.snapshot import nemo_util
 from galpy.potential import MovingObjectPotential
 from stream2_util import rectangular_to_cylindrical, R0, V0, lp, \
     calc_apar, calc_aA_sim
+def get_stream_orbit(snap_gc,apar):
+    close_to_impact_indx= numpy.fabs(apar+2.4) < 0.2
+    stream_orbit_RvR= rectangular_to_cylindrical(\
+        numpy.median(snap_gc[close_to_impact_indx,1:,-1],axis=0)[:,numpy.newaxis].T)[0,:]
+    stream_orbit= Orbit([stream_orbit_RvR[0]/R0,stream_orbit_RvR[1]/V0,stream_orbit_RvR[2]/V0,
+                         stream_orbit_RvR[3]/R0,stream_orbit_RvR[4]/V0,stream_orbit_RvR[5]])
+    return stream_orbit
+
 def vxta_deltav(snap_gc,apar,acfs):
     """
     NAME:
@@ -27,17 +35,13 @@ def vxta_deltav(snap_gc,apar,acfs):
     """
     # First we get the action-angle coordinates for the cluster orbit 
     # (approximating the cluster stream as an orbit)
-    close_to_impact_indx= numpy.fabs(apar+2.4) < 0.2
-    stream_orbit_RvR= rectangular_to_cylindrical(\
-        numpy.median(snap_gc[close_to_impact_indx,1:,-1],axis=0)[:,numpy.newaxis].T)[0,:]
-    stream_orbit= Orbit([stream_orbit_RvR[0]/R0,stream_orbit_RvR[1]/V0,stream_orbit_RvR[2]/V0,
-                         stream_orbit_RvR[3]/R0,stream_orbit_RvR[4]/V0,stream_orbit_RvR[5]])
+    stream_orbit= get_stream_orbit(snap_gc,apar)
     aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
     stream_orbit_aA= aAI.actionsFreqsAngles(stream_orbit())
     impact_apar= calc_apar(acfs,list(stream_orbit_aA[6:]))
     impact_Opar= calc_apar(acfs,list(stream_orbit_aA[3:6]),freq=True)
     # Now we integrate this cluster orbit back and forth to build position and velocity of the track
-    times= numpy.linspace(0.,0.12/bovy_conversion.time_in_Gyr(V0,R0),101)
+    times= numpy.linspace(0.,0.12/bovy_conversion.time_in_Gyr(V0,R0),51)
     stream_orbit.integrate(times,lp)
     stream_orbit_back= stream_orbit.flip()
     stream_orbit_back.integrate(times,lp)
@@ -63,7 +67,7 @@ def vxta_deltav(snap_gc,apar,acfs):
     return (v_gc,x_gc,t_gc,apar_gc)
 
 def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
-                              rs=0.1,
+                              rs=0.01,
                               tmax=0.25*0.9777922212082034/\
                                   bovy_conversion.time_in_Gyr(V0,R0)):
     """
@@ -86,6 +90,7 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
     """
     # For each dm particle, setup Plummer orbit
     plumpot= []
+    plumtimes= numpy.linspace(0.,tmax,10001)
     times= numpy.linspace(0.,tmax,1001)
     halftimes= numpy.linspace(0.,tmax/2.,1001)
     for ii in range(len(x0)):
@@ -93,7 +98,7 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
         R, phi, z= bovy_coords.rect_to_cyl(tx0[0],tx0[1],tx0[2])
         vR, vT, vz= bovy_coords.rect_to_cyl_vec(tv0[0],tv0[1],tv0[2],R,phi,z,cyl=True)
         oplum= Orbit(vxvv=[R,vR,vT,z,vz,phi])
-        oplum.integrate(times,galpot,method='symplec4_c')
+        oplum.integrate(plumtimes,galpot,method='symplec4_c')
         plumpot.append(MovingObjectPotential(orbit=oplum,GM=GM,
                                              softening_model='plummer',softening_length=rs))
     plumpot.append(galpot) # Need to add this to!
@@ -114,7 +119,24 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
         deltav[ii,2] = -ogalpot.vz(halftimes[-1])-v[ii,2]
     return deltav
 
-def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.2):
+def calc_impulse_curvedstream_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
+    """
+    NAME:
+       calc_fullplummer_deltav
+    PURPOSE:
+       Calculate the velocity kicks using full Plummer integration using a set of DM particles; each DM particle is considered separately
+    INPUT:
+       time - (string) time string identifying the DM simulation (0.125, 0.25, 0.375, or 0.50)
+       savefilename - name of the file to save the deltav to
+       ndm - number of DM particles to compute the kick for
+    OUTPUT:
+       deltav [nstar,3,ndm]
+    HISTORY:
+       2015-11-24 - Written - Bovy (UofT)
+    """
+    return None
+
+def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
     """
     NAME:
        calc_fullplummer_deltav
@@ -140,7 +162,7 @@ def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.2):
         v0= snap_dm[permIndx,4:,-1]/V0
         multiOut= multi.parallel_map(\
             lambda x: impulse_deltav_plummerint(v_gc,x_gc,lp,
-                                                10.**-4./bovy_conversion.mass_in_1010msol(V0,R0), # pretend all 10^6 Msolar, adjust later
+                                                10.**-3./bovy_conversion.mass_in_1010msol(V0,R0), # pretend all 10^7 Msolar, adjust later
                                                 numpy.reshape(x0[x],(1,3)),
                                                 numpy.reshape(v0[x],(1,3)),
                                                 rs=rs,
