@@ -103,7 +103,7 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
         oplum.integrate(plumtimes,galpot,method='symplec4_c')
         plumpot.append(MovingObjectPotential(orbit=oplum,GM=GM,
                                              softening_model='plummer',softening_length=rs))
-    plumpot.append(galpot) # Need to add this to!
+    plumpot.append(galpot) # Need to add this too!
     # Now integrate each (v,x) first backwards in galpot, then forwards in galpot+plumpot, then backwards in galpot
     deltav = numpy.zeros((len(v),3))
     R, phi, z= bovy_coords.rect_to_cyl(x[:,0],x[:,1],x[:,2])
@@ -111,11 +111,12 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
                                             R,phi,z,cyl=True)
     for ii in range(len(v)):
         ostar= Orbit(vxvv=[R[ii],-vR[ii],-vT[ii],z[ii],-vz[ii],phi[ii]])
-        ostar.integrate(halftimes,galpot,method='leapfrog_c')
+        ostar.integrate(halftimes,galpot,method='symplec4_c')
         oboth= ostar(halftimes[-1]).flip()
-        oboth.integrate(times,plumpot,method='leapfrog_c')
+        oboth.integrate(times,plumpot,method='symplec4_c',
+                        dt=(plumtimes[1]-plumtimes[0]))
         ogalpot = oboth(times[-1]).flip()
-        ogalpot.integrate(halftimes,galpot,method='leapfrog_c')
+        ogalpot.integrate(halftimes,galpot,method='symplec4_c')
         deltav[ii,0] = -ogalpot.vx(halftimes[-1])-v[ii,0]
         deltav[ii,1] = -ogalpot.vy(halftimes[-1])-v[ii,1]
         deltav[ii,2] = -ogalpot.vz(halftimes[-1])-v[ii,2]
