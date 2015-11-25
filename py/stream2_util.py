@@ -96,3 +96,13 @@ def calc_apar(acfs,angle=None,freq=False,debrisThreshold=6.):
     #parallel angle
     dangle= numpy.vstack((thetar,thetap,thetaz))
     return numpy.dot(dangle.T,dOdir)
+
+def calc_apars_dm(thetar,thetap,thetaz,aa_dm,oparDir_dm,t=0.):
+    dangle= numpy.vstack((thetar-aa_dm[3]*t,
+                          thetap-aa_dm[4]*t,
+                          thetaz-aa_dm[5]*t))
+    return numpy.dot(dangle.T,oparDir_dm)
+
+def calc_opars_dm(Or,Op,Oz,oparDir_dm):
+    dfreq= numpy.vstack((Or,Op,Oz))
+    return numpy.dot(dfreq.T,oparDir_dm)
