@@ -3,13 +3,15 @@ import sys
 import os, os.path
 import pickle
 import numpy
+from scipy import interpolate
 from galpy.orbit import Orbit
 from galpy.util import save_pickles, multi, bovy_conversion, bovy_coords
 from galpy.actionAngle import actionAngleIsochroneApprox
 from galpy.snapshot import nemo_util
 from galpy.potential import MovingObjectPotential
+import galpy.df_src.streamgapdf
 from stream2_util import rectangular_to_cylindrical, R0, V0, lp, \
-    calc_apar, calc_aA_sim
+    calc_apar, calc_aA_sim, calc_apars_dm, calc_opars_dm
 def get_stream_orbit(snap_gc,apar):
     close_to_impact_indx= numpy.fabs(apar+2.4) < 0.2
     stream_orbit_RvR= rectangular_to_cylindrical(\
@@ -119,22 +121,66 @@ def impulse_deltav_plummerint(v,x,galpot,GM,x0,v0,
         deltav[ii,2] = -ogalpot.vz(halftimes[-1])-v[ii,2]
     return deltav
 
-def calc_impulse_curvedstream_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
+def calc_impulse_curvedstream_deltav(time,savefilename,v_gc,x_gc,t_gc,
+                                     aa_dm,oparDir_dm,stream_orbit,
+                                     rs=0.1):
     """
     NAME:
-       calc_fullplummer_deltav
+       calc_impulse_curvedstream_deltav
     PURPOSE:
-       Calculate the velocity kicks using full Plummer integration using a set of DM particles; each DM particle is considered separately
+       Calculate the velocity kicks using the impulse approximation, but taking into account that stars move along the stream track
     INPUT:
        time - (string) time string identifying the DM simulation (0.125, 0.25, 0.375, or 0.50)
        savefilename - name of the file to save the deltav to
-       ndm - number of DM particles to compute the kick for
     OUTPUT:
-       deltav [nstar,3,ndm]
+       deltav [nstar,3]
     HISTORY:
        2015-11-24 - Written - Bovy (UofT)
     """
-    return None
+    if not os.path.exists(savefilename):
+        # Load DM snapshot action-angles
+        acfs_after= calc_aA_sim(None,
+                                os.path.join(os.getenv('DATADIR'),'bovy',
+                                             'stream-stream',
+                                             'gcdm_evol_%s_afterimpact_aa.dat' % time),
+                                None) # No need for RvR
+        # Calculate parallel angles at impact
+        apar_dm_impact= calc_apars_dm(2.*numpy.pi+(acfs_after[6]+numpy.pi)%(2.*numpy.pi)
+                                      -numpy.pi-acfs_after[3]*0.125*0.9777922212082034/bovy_conversion.time_in_Gyr(V0,R0)-aa_dm[6],
+                                      acfs_after[7]-acfs_after[4]*0.125*0.9777922212082034/bovy_conversion.time_in_Gyr(V0,R0)-aa_dm[7],
+                                      2.*numpy.pi+acfs_after[8]-acfs_after[5]*0.125*0.9777922212082034/bovy_conversion.time_in_Gyr(V0,R0)-aa_dm[8],
+                                      aa_dm,oparDir_dm)
+        # Estimate times at which each point passes through the impact point
+        opar_dm= calc_opars_dm(acfs_after[3],acfs_after[4],acfs_after[5],
+                               oparDir_dm)
+        dt_dm= -apar_dm_impact/opar_dm
+        if time.lower() == '0.50':
+            dt_dm-= numpy.nanmedian(dt_dm)
+        # Build interpolate distribution of arrival times
+        if time.lower() == '0.50' or time.lower() == '0.375':
+            irange= [-3.5,3.5]
+        else:
+            irange= [-2.5,2.5]
+        b, e= numpy.histogram(dt_dm[True^numpy.isnan(dt_dm)],
+                              bins=101,normed=True,range=irange)
+        tInterp= interpolate.UnivariateSpline(0.5*(numpy.roll(e,1)+e)[1:],
+                                              b,k=3,s=0.01)
+        GSigma= lambda t: 10.**-2./bovy_conversion.mass_in_1010msol(V0,R0)\
+            *tInterp(t)
+        # Compute kicks
+        deltav=\
+            galpy.df_src.streamgapdf.impulse_deltav_plummerstream_curvedstream(\
+            v_gc,x_gc,t_gc,0.,
+            numpy.array([6.82200571,132.7700529,149.4174464])/V0,
+            numpy.array([-13.500000,2.840000,-1.840000])/R0,
+            numpy.array([stream_orbit.vx()[0],stream_orbit.vy()[0],stream_orbit.vz()]),
+            GSigma,
+            rs/R0,lp,irange[0],irange[1])
+        save_pickles(savefilename,deltav)
+    else:
+        with open(savefilename,'rb') as savefile:
+            deltav= pickle.load(savefile)
+    return deltav
 
 def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
     """
@@ -191,3 +237,22 @@ if __name__ == '__main__':
         # Inputs: fullplummer 0.50 SAVEFILENAME 100
         calc_fullplummer_deltav(sys.argv[2],sys.argv[3],int(sys.argv[4]),
                                 v_gc,x_gc)
+    elif sys.argv[1].lower() == 'impulse':
+        # DM at the time of impact
+        xv_dm_impact= numpy.array([-13.500000,2.840000,-1.840000,
+                                    6.82200571,132.7700529,149.4174464])
+        RvR_dm_impact= rectangular_to_cylindrical(\
+            xv_dm_impact[:,numpy.newaxis].T)[0,:]
+        dm_impact= Orbit([RvR_dm_impact[0]/R0,RvR_dm_impact[1]/V0,
+                          RvR_dm_impact[2]/V0,RvR_dm_impact[3]/R0,
+                          RvR_dm_impact[4]/V0,RvR_dm_impact[5]],ro=R0,vo=V0)
+        aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
+        aa_dm= aAI.actionsFreqsAngles(dm_impact)
+        oparDir_dm= numpy.array([aa_dm[3],aa_dm[4],aa_dm[5]])
+        oparDir_dm/= numpy.sqrt(numpy.sum(oparDir_dm**2.))
+        # Also get the stream_orbit
+        stream_orbit= get_stream_orbit(snap_gc,apar)
+        # Calculate
+        calc_impulse_curvedstream_deltav(sys.argv[2],sys.argv[3],
+                                         v_gc,x_gc,t_gc,
+                                         aa_dm,oparDir_dm,stream_orbit)
