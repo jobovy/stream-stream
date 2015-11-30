@@ -18,7 +18,7 @@ seaborn).
 
 ## Code overview
 
-### [StreamKicks.ipynb]([py/StreamKicks.ipynb)
+### [StreamKicks.ipynb](py/StreamKicks.ipynb)
 
 Brief notebook that computes the kicks due to the interaction of a
 stellar stream with a dark-matter stream in the impulse approximation.
