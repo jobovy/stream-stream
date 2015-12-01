@@ -25,10 +25,13 @@ stellar stream with a dark-matter stream in the impulse approximation.
 
 ### [SnapshotAnalysis.ipynb](py/SnapshotAnalysis.ipynb)
 
+(better on
+[nbviewer](http://nbviewer.ipython.org/github/jobovy/stream-stream/py/SnapshotAnalysis.ipynb))
+
 Notebook analyzing *N*-body simulations of the interaction between a
 stellar stream and various dark-matter streams. The initial conditions
-for the *N*-body simulation are computed in (this
-notebook)[py/Orbits-for-Nbody.ipynb].
+for the *N*-body simulation are computed in [this
+notebook](py/Orbits-for-Nbody.ipynb).
 
 The *N*-body simulations are run using gyrfalcON and
 [NEMO](bima.astro.umd.edu/nemo/) and use a variety of NEMO tools. The
