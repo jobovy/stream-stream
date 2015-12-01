@@ -26,7 +26,7 @@ stellar stream with a dark-matter stream in the impulse approximation.
 ### [SnapshotAnalysis.ipynb](py/SnapshotAnalysis.ipynb)
 
 (better on
-[nbviewer](http://nbviewer.ipython.org/github/jobovy/stream-stream/py/SnapshotAnalysis.ipynb))
+[nbviewer](http://nbviewer.ipython.org/github/jobovy/stream-stream/blob/master/py/SnapshotAnalysis.ipynb))
 
 Notebook analyzing *N*-body simulations of the interaction between a
 stellar stream and various dark-matter streams. The initial conditions
