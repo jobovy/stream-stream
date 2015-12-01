@@ -1,12 +1,12 @@
 # stream-stream
 
-This small repository contains the code to do the analysis in [Bovy
+This repository contains the code to do the analysis in [Bovy
 (2015)](http://arxiv.org/abs/1512.XXXXX) of the interaction between a
 stellar stream and a disrupting dark-matter halo.
 
 ## AUTHOR
 
-Jo Bovy - bovy - at - astro - dot - utoronto -  dot - ca
+Jo Bovy - bovy at astro dot utoronto dot ca
 
 ## Requirements
 
