@@ -54,8 +54,8 @@ Do::
 	gyrfalcON in=gc_shifted.nemo out=$DATADIR/bovy/stream-stream/gc_evol_untilimpact.nemo tstop=10.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gc_evol_untilimpact.log 2>&1
 	snaptrim in=$DATADIR/bovy/stream-stream/gc_evol_untilimpact.nemo out=-  times=10.125 | snaptime in=- out=gc_beforeimpact.nemo
 
-DM perturber
-+++++++++++++
+DM perturber (Plummer case)
+++++++++++++++++++++++++++++
 
 The DM perturber is set on an orbit that interacts with the GC at
 10.25 time units of the GC evolution. We model the DM perturber as a
@@ -90,6 +90,7 @@ impact (we can skip the 0.125 one, because it's there already)::
 	gyrfalcON in=dm_shifted_0.50.nemo out=$DATADIR/bovy/stream-stream/dm_evol_0.50_untilimpact.nemo tstop=0.375 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_0.50_untilimpact.log 2>&1
 	gyrfalcON in=dm_shifted_0.375.nemo out=$DATADIR/bovy/stream-stream/dm_evol_0.375_untilimpact.nemo tstop=0.25 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_0.375_untilimpact.log 2>&1
 	gyrfalcON in=dm_shifted_0.25.nemo out=$DATADIR/bovy/stream-stream/dm_evol_0.25_untilimpact.nemo tstop=0.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm_evol_0.25_untilimpact.log 2>&1
+	cp dm_evol_0.50_untilimpact.nemo $DATADIR/bovy/stream-stream/dm_evol_0.125_untilimpact.nemo
 
 and we get the final outputs with ``snaptrim``::
 
@@ -117,3 +118,69 @@ The final output files are then generated as::
     snaptrim in=$DATADIR/bovy/stream-stream/gcdm_evol_0.375_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdm_evol_0.375_afterimpact.dat
     snaptrim in=$DATADIR/bovy/stream-stream/gcdm_evol_0.25_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdm_evol_0.25_afterimpact.dat
     snaptrim in=$DATADIR/bovy/stream-stream/gcdm_evol_0.125_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdm_evol_0.125_afterimpact.dat
+
+DM perturber (NFW case)
++++++++++++++++++++++++
+
+In the NFW case, the DM perturber is set on an orbit that interacts
+with the GC at 10.25 time units of the GC evolution. We model the DM
+perturber as an NFW sphere with mass 10^8, rs = 0.9 kpc, and a tidal
+radius of 2 kpc. We generate the DM halo as::
+
+     mkhalo out=dmnfw.nemo nbody=100000 model=NFW r_s=0.9 M=100000000 r_t=2.0 WD_units=t
+
+If the DM halo starts out 0.50 time units ago, we need to shift it
+as::
+
+	snapshift dmnfw.nemo dmnfw_shifted_0.50.nemo rshift=7.9948807918667892,0.9626499711978439,-11.344426189362455 vshift=-100.4814119301404,-151.74007155179646,-84.037056563181252
+
+If the DM halo starts out 0.375 time units ago, we need to shift it
+as::
+
+	snapshift dmnfw.nemo dmnfw_shifted_0.375.nemo rshift=-8.5662119198502609,-6.4724441270571687,0.50120970587644287 vshift=-50.169060756613071,112.96727941016003,214.43730878238947
+
+If the DM halo starts out 0.25 time units ago, we need to shift it
+as::
+
+	snapshift dmnfw.nemo dmnfw_shifted_0.25.nemo rshift=4.8965792014085778,10.033551072654888,8.9181416272959186 vshift=149.50458227428786,21.235006395774576,-97.714578287010966
+
+If the DM halo starts out 0.125 time units ago, we need to shift it
+as::
+
+	snapshift dmnfw.nemo dmnfw_shifted_0.125.nemo rshift=5.2570183967301833,-4.5786210693408176,-7.8848620802774407 vshift=-195.34540991555195,-155.93944808745755,-51.644977186288536
+
+We integrate these snapshots until 0.125 time units before the
+impact (we can skip the 0.125 one, because it's there already)::
+
+	gyrfalcON in=dmnfw_shifted_0.50.nemo out=$DATADIR/bovy/stream-stream/dmnfw_evol_0.50_untilimpact.nemo tstop=0.375 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dmnfw_evol_0.50_untilimpact.log 2>&1
+	gyrfalcON in=dmnfw_shifted_0.375.nemo out=$DATADIR/bovy/stream-stream/dmnfw_evol_0.375_untilimpact.nemo tstop=0.25 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dmnfw_evol_0.375_untilimpact.log 2>&1
+	gyrfalcON in=dmnfw_shifted_0.25.nemo out=$DATADIR/bovy/stream-stream/dmnfw_evol_0.25_untilimpact.nemo tstop=0.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dmnfw_evol_0.25_untilimpact.log 2>&1
+	cp dmnfw_evol_0.50_untilimpact.nemo $DATADIR/bovy/stream-stream/dmnfw_evol_0.125_untilimpact.nemo
+
+and we get the final outputs with ``snaptrim``::
+
+    	snaptrim in=$DATADIR/bovy/stream-stream/dmnfw_evol_0.50_untilimpact.nemo  out=- times=0.375 | snaptime in=- out=dmnfw_0.50_beforeimpact.nemo
+    	snaptrim in=$DATADIR/bovy/stream-stream/dmnfw_evol_0.375_untilimpact.nemo out=- times=0.25 | snaptime in=- out=dmnfw_0.375_beforeimpact.nemo
+    	snaptrim in=$DATADIR/bovy/stream-stream/dmnfw_evol_0.25_untilimpact.nemo out=-  times=0.125 | snaptime in=- out=dmnfw_0.25_beforeimpact.nemo
+
+These are added to the GC simulation with ``snapstack``::
+
+      snapstack in1=gc_beforeimpact.nemo in2=dmnfw_0.50_beforeimpact.nemo out=gcdmnfw_0.50_beforeimpact.nemo
+      snapstack in1=gc_beforeimpact.nemo in2=dmnfw_0.375_beforeimpact.nemo out=gcdmnfw_0.375_beforeimpact.nemo
+      snapstack in1=gc_beforeimpact.nemo in2=dmnfw_0.25_beforeimpact.nemo out=gcdmnfw_0.25_beforeimpact.nemo
+      snapstack in1=gc_beforeimpact.nemo in2=dmnfw_shifted_0.125.nemo out=gcdmnfw_0.125_beforeimpact.nemo
+
+Now we can run these forward::
+
+	gyrfalcON in=gcdmnfw_0.50_beforeimpact.nemo out=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.50_impact.nemo tstop=0.250 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gcdmnfw_evol_0.50_impact.log 2>&1
+	gyrfalcON in=gcdmnfw_0.375_beforeimpact.nemo out=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.375_impact.nemo tstop=0.250 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gcdmnfw_evol_0.375_impact.log 2>&1
+	gyrfalcON in=gcdmnfw_0.25_beforeimpact.nemo out=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.25_impact.nemo tstop=0.250 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gcdmnfw_evol_0.25_impact.log 2>&1
+	gyrfalcON in=gcdmnfw_0.125_beforeimpact.nemo out=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.125_impact.nemo tstop=0.250 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gcdmnfw_evol_0.125_impact.log 2>&1
+
+The final output files are then generated as::
+
+    snaptrim in=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.50_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdmnfw_evol_0.50_afterimpact.dat
+    snaptrim in=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.375_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdmnfw_evol_0.375_afterimpact.dat
+    snaptrim in=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.25_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdmnfw_evol_0.25_afterimpact.dat
+    snaptrim in=$DATADIR/bovy/stream-stream/gcdmnfw_evol_0.125_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdmnfw_evol_0.125_afterimpact.dat
+
