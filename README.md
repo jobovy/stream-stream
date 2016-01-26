@@ -1,7 +1,7 @@
 # stream-stream
 
 This repository contains the code to do the analysis in [Bovy
-(2015)](http://arxiv.org/abs/1512.XXXXX) of the interaction between a
+(2015)](http://arxiv.org/abs/1512.00452) of the interaction between a
 stellar stream and a disrupting dark-matter halo.
 
 ## AUTHOR
@@ -11,7 +11,7 @@ Jo Bovy - bovy at astro dot utoronto dot ca
 ## Requirements
 
 * [galpy](https://github.com/jobovy/galpy)
-* [NEMO](http://bima.astro.umd.edu/nemo/)
+* [NEMO](http://bima.astro.umd.edu/nemo/); see [jobovy/nemo](https://github.com/jobovy/nemo) for a perhaps easier to install version
 
 and the usual scientific Python packages (Numpy, Scipy, matplotlib,
 seaborn).
