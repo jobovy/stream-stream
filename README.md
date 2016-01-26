@@ -34,8 +34,9 @@ for the *N*-body simulation are computed in [this
 notebook](py/Orbits-for-Nbody.ipynb).
 
 The *N*-body simulations are run using gyrfalcON and
-[NEMO](bima.astro.umd.edu/nemo/) and use a variety of NEMO tools. The
-initial conditions and the necessary commands to run the *N*-body
-simulations are given in [the sim directory](sim/). Using these it
-should be straightforward to repeat the analysis in the paper.
+[NEMO](http://bima.astro.umd.edu/nemo/) and use a variety of NEMO
+tools. The initial conditions and the necessary commands to run the
+*N*-body simulations are given in [the sim directory](sim/). Using
+these it should be straightforward to repeat the analysis in the
+paper.
 
