@@ -183,7 +183,8 @@ def calc_impulse_curvedstream_deltav(time,savefilename,v_gc,x_gc,t_gc,
             deltav= pickle.load(savefile)
     return deltav
 
-def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
+def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01,
+                            nfw=False):
     """
     NAME:
        calc_fullplummer_deltav
@@ -193,15 +194,21 @@ def calc_fullplummer_deltav(time,savefilename,ndm,v_gc,x_gc,rs=0.01):
        time - (string) time string identifying the DM simulation (0.125, 0.25, 0.375, or 0.50)
        savefilename - name of the file to save the deltav to
        ndm - number of DM particles to compute the kick for
+       nfw= (False) if True, analyze the NFW simulations
     OUTPUT:
        deltav [nstar,3,ndm]
     HISTORY:
        2015-11-24 - Written - Bovy (UofT)
+       2016-01-26 - Edited for NFW - Bovy (UofT)
     """
     if not os.path.exists(savefilename):
         # Load DM snapshot
-        filename= os.path.join(os.getenv('DATADIR'),'bovy','stream-stream',
-                               'dm_evol_%s_untilimpact.dat' % time)
+        if nfw:
+            filename= os.path.join(os.getenv('DATADIR'),'bovy','stream-stream',
+                                   'dmnfw_evol_%s_untilimpact.dat' % time)
+        else:
+            filename= os.path.join(os.getenv('DATADIR'),'bovy','stream-stream',
+                                   'dm_evol_%s_untilimpact.dat' % time)
         snap_dm= nemo_util.read(filename,swapyz=True)
         numpy.random.seed(1)
         permIndx= numpy.random.permutation(len(snap_dm))
@@ -237,7 +244,7 @@ if __name__ == '__main__':
     if sys.argv[1].lower() == 'fullplummer':
         # Inputs: fullplummer 0.50 SAVEFILENAME 100
         calc_fullplummer_deltav(sys.argv[2],sys.argv[3],int(sys.argv[4]),
-                                v_gc,x_gc)
+                                v_gc,x_gc,nfw=False)
     elif sys.argv[1].lower() == 'impulse':
         # DM at the time of impact
         xv_dm_impact= numpy.array([-13.500000,2.840000,-1.840000,
