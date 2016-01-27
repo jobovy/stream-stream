@@ -40,3 +40,12 @@ tools. The initial conditions and the necessary commands to run the
 these it should be straightforward to repeat the analysis in the
 paper.
 
+### [SnapshotAnalysisNFW.ipynb](py/SnapshotAnalysisNFW.ipynb)
+
+(better on
+[nbviewer](http://nbviewer.ipython.org/github/jobovy/stream-stream/blob/master/py/SnapshotAnalysisNFW.ipynb), where you can toggle the code)
+
+Same as above, but for simulations where the DM halo is modeled as an
+NFW halo rather than a Plummer sphere. The resulting tidal tails and
+their effect on the globular-cluster stream are very similar for these
+two cases.
