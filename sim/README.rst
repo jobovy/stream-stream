@@ -205,22 +205,22 @@ as::
 
 	snapshift dm-0.5.nemo dm-0.5_shifted_0.25.nemo rshift=0.90421868718568454,11.079300548190444,3.7176316528507094 vshift=71.494711851673969,136.43737446859959,1.0444192199789275
 
-We integrate these until 0.125 time units before the impact:
+We integrate these until 0.125 time units before the impact::
 
    gyrfalcON in=dm-0.5_shifted_0.25.nemo out=$DATADIR/bovy/stream-stream/dm-0.5_evol_0.25_untilimpact.nemo tstop=0.125 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > dm-0.5_evol_0.25_untilimpact.log 2>&1
 
-and we get the final outputs with ``snaptrim``:
+and we get the final outputs with ``snaptrim``::
 
     snaptrim in=$DATADIR/bovy/stream-stream/dm-0.5_evol_0.25_untilimpact.nemo out=-  times=0.125 | snaptime in=- out=dm-0.5_0.25_beforeimpact.nemo
 
-These are added to the GC simulation with ``snapstack``:
+These are added to the GC simulation with ``snapstack``::
 
       snapstack in1=gc_beforeimpact.nemo in2=dm-0.5_0.25_beforeimpact.nemo out=gcdm-0.5_0.25_beforeimpact.nemo
 
-Now we can run these forward:
+Now we can run these forward::
 
     gyrfalcON in=gcdm-0.5_0.25_beforeimpact.nemo out=$DATADIR/bovy/stream-stream/gcdm-0.5_evol_0.25_impact.nemo tstop=0.250 eps=0.0015 step=0.125 kmax=6 Nlev=10 fac=0.01 accname=LogPot accpars=0,48400.,0.,1.0,0.9 > gcdm-0.5_evol_0.25_impact.log 2>&1
 
-The final output files are then generated as:
+The final output files are then generated as::
 
     snaptrim in=$DATADIR/bovy/stream-stream/gcdm-0.5_evol_0.25_impact.nemo out=- times=0.25 | s2a - $DATADIR/bovy/stream-stream/gcdm-0.5_evol_0.25_afterimpact.dat
